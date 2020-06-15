@@ -1,14 +1,16 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, connect } from 'react-redux';
 import './students.css';
 import { getStudents } from '../../redux/student/student.actions';
 
 const Students = () => {
+  // const Students = ({ getStudents, students }) => {
   const students = useSelector((state) => state.student.students);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getStudents());
+    // getStudents();
   }, [dispatch]);
 
   return (

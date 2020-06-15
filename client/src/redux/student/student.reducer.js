@@ -5,7 +5,6 @@ const INITIAL_STATE = {
 };
 
 const studentReducer = (state = INITIAL_STATE, action) => {
-  console.log({ action });
   switch (action.type) {
     case StudentActionTypes.GET_STUDENTS:
       return {
@@ -16,5 +15,4 @@ const studentReducer = (state = INITIAL_STATE, action) => {
       return state;
   }
 };
-//
 export default studentReducer;
