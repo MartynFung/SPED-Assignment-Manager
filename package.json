@@ -5,10 +5,10 @@
   "main": "server.js",
   "scripts": {
     "client-install": "cd client && npm install",
-    "start": "node server",
-    "server": "nodemon server",
+    "start": "node server.js",
+    "server": "nodemon server.js",
     "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server.js\" \"npm run client\"",
     "test": "node server"
   },
   "author": "Martyn Fung",
@@ -18,9 +18,16 @@
     "@material-ui/icons": "^4.9.1",
     "bcrypt": "^5.0.0",
     "concurrently": "^5.2.0",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "pg": "^8.2.1"
+    "express-flash": "0.0.2",
+    "express-session": "^1.17.1",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.2.1",
+    "uuidv4": "^6.1.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"

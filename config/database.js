@@ -1,23 +1,17 @@
 const { Pool } = require('pg');
-const {
-  dbUser,
-  dbPassword,
-  dbDatabase,
-  dbHost,
-  dbPort,
-  nodeEnv,
-} = require('../envConfig');
 
 const pool = new Pool({
-  user: dbUser,
-  password: dbPassword,
-  database: dbDatabase,
-  host: dbHost,
-  port: dbPort,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
   max: 20,
   connectionTimeoutMillis: 0,
   idleTimeoutMillis: 0,
 });
+
+// TODO: different connection string if dev or prod
 
 // const isProduction = nodeEnv === 'production';
 // const connectionString = `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbDatabase}`;

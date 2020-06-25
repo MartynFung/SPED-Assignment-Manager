@@ -1,6 +1,5 @@
-const express = require('express');
-const router = express.Router();
-const pool = require('../dbConfig');
+const router = require('express').Router();
+const pool = require('../config/database');
 
 // Get all todos
 router.get('/', async (req, res) => {
