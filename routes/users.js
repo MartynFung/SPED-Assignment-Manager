@@ -26,12 +26,12 @@ router.get(
 
 router.post('/login', async (req, res) => {
   if (!req.body.email || !req.body.password) {
-    return res.status(401).send({ message: 'Some values are missing' });
+    return res.status(400).send({ message: 'Some values are missing' });
   }
 
   if (!Utils.isValidEmail(req.body.email)) {
     return res
-      .status(401)
+      .status(400)
       .json({ message: 'Please enter a valid email address' });
   }
 
@@ -52,14 +52,17 @@ router.post('/login', async (req, res) => {
       user.hash,
       user.salt
     );
+    console.log('logging in');
+    console.log(isValid);
 
     if (isValid) {
-      const jwt = Utils.issueJWT(user.id);
-      return res.json({
+      const jwt = Utils.issueJWT(user);
+      console.log({ jwt });
+      return res.status(200).json({
         success: true,
         user: user,
-        token: jwt,
-        expiresIn: jwt.expiresIn,
+        token: jwt.token,
+        expiresIn: jwt.expires,
       });
     } else {
       return res
@@ -96,12 +99,12 @@ router.post('/register', async (req, res) => {
   try {
     const { rows } = await pool.query(sqlQuery, values);
     const user = rows[0];
-    const jwt = Utils.issueJWT(user.id);
+    const jwt = Utils.issueJWT(user);
     return res.json({
       success: true,
       user: user,
-      token: jwt,
-      expiresIn: jwt.expiresIn,
+      token: jwt.token,
+      expiresIn: jwt.expires,
     });
   } catch (error) {
     if (error.routine === '_bt_check_unique') {

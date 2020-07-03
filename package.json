@@ -8,7 +8,7 @@
     "start": "node server.js",
     "server": "nodemon server.js",
     "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server.js\" \"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "test": "node server"
   },
   "author": "Martyn Fung",
@@ -25,7 +25,6 @@
     "express-session": "^1.17.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
-    "passport-local": "^1.0.0",
     "pg": "^8.2.1",
     "uuidv4": "^6.1.1"
   },

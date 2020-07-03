@@ -3,7 +3,7 @@ import { useDispatch, useSelector, connect } from 'react-redux';
 import './students.css';
 import { getStudents } from '../../redux/student/student.actions';
 
-const Students = () => {
+const StudentPage = () => {
   // const Students = ({ getStudents, students }) => {
   const students = useSelector((state) => state.student.students);
   const dispatch = useDispatch();
@@ -37,4 +37,4 @@ const Students = () => {
 // });
 
 // export default connect(mapStateToProps, mapDispatchToProps)(Students);
-export default Students;
+export default StudentPage;

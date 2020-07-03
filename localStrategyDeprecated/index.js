@@ -67,6 +67,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
 // All remaining requests return the React app, so it can handle routing.
-// app.get('*', function (request, response) {
+// app.get('*', (request, response) => {
 //   response.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
 // });

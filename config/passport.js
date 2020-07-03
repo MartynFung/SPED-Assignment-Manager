@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const pool = require('../config/database');
 
+const jwt = require('jsonwebtoken');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
@@ -16,10 +17,10 @@ const options = {
 
 // Verify JWT:
 // Take jwt from auth header > validate jwt > get userID from payload.sub > get user from DB by ID > passport attaches returned user to the request.user object in the express framework
-const strategy = new JwtStrategy(options, async (payload, done) => {
+const strategy = new JwtStrategy(options, async (jwt_payload, done) => {
   try {
     const user = await pool.query('SELECT * FROM users WHERE id = $1 LIMIT 1', [
-      payload.sub,
+      jwt_payload.sub,
     ]);
     if (user) {
       return done(null, user);

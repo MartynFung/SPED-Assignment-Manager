@@ -1,7 +1,7 @@
 import StudentActionTypes from './student.types';
 
 export const getStudents = () => (dispatch) => {
-  return fetch('/students')
+  return fetch('/api/students')
     .then((res) => res.json())
     .then((students) =>
       dispatch({

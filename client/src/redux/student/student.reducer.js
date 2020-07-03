@@ -15,4 +15,5 @@ const studentReducer = (state = INITIAL_STATE, action) => {
       return state;
   }
 };
+
 export default studentReducer;

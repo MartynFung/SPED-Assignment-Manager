@@ -26,7 +26,7 @@ app.use(cors());
 // Imports all of the routes from ./routes/index.js
 app.use(require('./routes'));
 
-app.get('/students', (req, res) => {
+app.get('/api/students', (req, res) => {
   const students = [
     { id: 1, firstName: 'Jon', lastName: 'Doe' },
     { id: 2, firstName: 'Steve', lastName: 'Smith' },
@@ -34,6 +34,31 @@ app.get('/students', (req, res) => {
   ];
 
   res.json(students);
+});
+
+app.get('/api/teachers', (req, res) => {
+  const teachers = [
+    {
+      teacher_id: 1,
+      first_name: 'Jon',
+      last_name: 'Doe',
+      email: 'jon@gmail.com',
+    },
+    {
+      teacher_id: 2,
+      first_name: 'Steve',
+      last_name: 'Smith',
+      email: 'steve@gmail.com',
+    },
+    {
+      teacher_id: 3,
+      first_name: 'Mary',
+      last_name: 'Swanson',
+      email: 'mary@gmail.com',
+    },
+  ];
+
+  res.json(teachers);
 });
 
 // SERVER
