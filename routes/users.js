@@ -52,8 +52,6 @@ router.post('/login', async (req, res) => {
       user.hash,
       user.salt
     );
-    console.log('logging in');
-    console.log(isValid);
 
     if (isValid) {
       const jwt = Utils.issueJWT(user);

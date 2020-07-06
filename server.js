@@ -36,31 +36,6 @@ app.get('/api/students', (req, res) => {
   res.json(students);
 });
 
-app.get('/api/teachers', (req, res) => {
-  const teachers = [
-    {
-      teacher_id: 1,
-      first_name: 'Jon',
-      last_name: 'Doe',
-      email: 'jon@gmail.com',
-    },
-    {
-      teacher_id: 2,
-      first_name: 'Steve',
-      last_name: 'Smith',
-      email: 'steve@gmail.com',
-    },
-    {
-      teacher_id: 3,
-      first_name: 'Mary',
-      last_name: 'Swanson',
-      email: 'mary@gmail.com',
-    },
-  ];
-
-  res.json(teachers);
-});
-
 // SERVER
 const PORT = process.env.PORT || 5000;
 

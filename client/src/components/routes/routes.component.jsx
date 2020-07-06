@@ -11,6 +11,12 @@ const Routes = ({ childProps }) => {
   return (
     <Switch>
       <UnauthenticatedRoute
+        path='/'
+        exact
+        component={LoginForm}
+        props={childProps}
+      />
+      <UnauthenticatedRoute
         path='/login'
         exact
         component={LoginForm}

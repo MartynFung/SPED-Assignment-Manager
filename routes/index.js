@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
-router.use('/todos', require('./todos'));
-router.use('/users', require('./users'));
+router.use('/api/todos', require('./todos'));
+router.use('/api/users', require('./users'));
+router.use('/api/teachers', require('./teachers'));
 
 module.exports = router;

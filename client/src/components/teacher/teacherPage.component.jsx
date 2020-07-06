@@ -12,6 +12,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Button from '@material-ui/core/Button';
+import TeacherForm from './teacherForm.component';
 
 const columns = [
   { id: 'first_name', label: 'First Name', minWidth: 200 },
@@ -22,6 +23,7 @@ const columns = [
 const useStyles = makeStyles({
   root: {
     width: '100%',
+    margin: '30px',
   },
   container: {
     maxHeight: 440,
@@ -54,6 +56,7 @@ const TeacherPage = () => {
       <Button variant='contained' color='primary'>
         Add Teacher
       </Button>
+      <TeacherForm />
       <Paper className={classes.root}>
         <TableContainer className={classes.container}>
           <Table stickyHeader aria-label='sticky table'>
