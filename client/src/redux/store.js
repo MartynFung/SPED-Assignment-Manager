@@ -3,7 +3,7 @@ import logger from 'redux-logger';
 
 import thunk from 'redux-thunk';
 
-import rootReducer from './root-reducer';
+import rootReducer from './rootReducer';
 
 // logger must be the last middleware in chain, otherwise it will log thunk and promise, not actual actions
 const middlewares = [thunk, logger];

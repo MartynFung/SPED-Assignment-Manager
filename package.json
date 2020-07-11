@@ -14,8 +14,6 @@
   "author": "Martyn Fung",
   "license": "MIT",
   "dependencies": {
-    "@material-ui/core": "^4.10.1",
-    "@material-ui/icons": "^4.9.1",
     "bcrypt": "^5.0.0",
     "concurrently": "^5.2.0",
     "cors": "^2.8.5",

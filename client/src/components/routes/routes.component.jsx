@@ -1,9 +1,9 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import LoginForm from '../login/login.component';
-import NotFound from './not-found.component';
+import NotFound from './notFound.component';
 import UnauthenticatedRoute from './unauthenticated-route.component';
-import AuthenticatedRoute from './authenticated-route.component';
+import AuthenticatedRoute from './authenticatedRoute.component';
 import TeacherPage from '../teacher/teacherPage.component';
 import StudentPage from '../student/studentPage.component';
 
