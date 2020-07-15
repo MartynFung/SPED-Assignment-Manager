@@ -2,7 +2,6 @@ const router = require('express').Router();
 const Utils = require('../lib/utils');
 const pool = require('../config/database');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
 
 // @route POST api/user/register

@@ -94,14 +94,4 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-//TODO
-// router.get(
-//   '/protected',
-//   passport.authenticate('jwt', { session: false }),
-//   (req, res, next) => {
-//     console.log('protected');
-//     res.status(200).json({ success: true, message: 'you are authorized' });
-//   }
-// );
-
 module.exports = router;

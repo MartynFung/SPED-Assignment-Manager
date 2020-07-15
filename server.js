@@ -1,19 +1,11 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const passport = require('passport');
 
 // Provides acccess to variables in .env file via 'process.env.VARIABLE_NAME'
 require('dotenv').config();
 
 // Create the Express app
 const app = express();
-
-// Pass the global passport object into the configuration function
-require('./config/passport')(passport);
-
-// Initialize the passport object on every request
-app.use(passport.initialize());
 
 // Use Express implementation of body parser
 app.use(express.json());
