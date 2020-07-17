@@ -6,14 +6,15 @@ import UnauthenticatedRoute from './unauthenticated-route.component';
 import AuthenticatedRoute from './authenticatedRoute.component';
 import TeacherPage from '../teacher/teacherPage.component';
 import StudentPage from '../student/studentPage.component';
+import RegisterForm from '../register/register.component';
 
 const Routes = ({ childProps }) => {
   return (
     <Switch>
       <UnauthenticatedRoute
-        path='/'
+        path='/register'
         exact
-        component={LoginForm}
+        component={RegisterForm}
         props={childProps}
       />
       <UnauthenticatedRoute
@@ -22,24 +23,24 @@ const Routes = ({ childProps }) => {
         component={LoginForm}
         props={childProps}
       />
-      <UnauthenticatedRoute
+      {/*<UnauthenticatedRoute
         path='/teachers'
         exact
         component={TeacherPage}
         props={childProps}
-      />
+      />*/}
       <UnauthenticatedRoute
         path='/students'
         exact
         component={StudentPage}
         props={childProps}
       />
-      {/*<AuthenticatedRoute
-        path='/dashboard'
+      <AuthenticatedRoute
+        path='/teachers'
         exact
-        component={dashboard}
+        component={TeacherPage}
         props={childProps}
-      />*/}
+      />
       <Route component={NotFound} />
     </Switch>
   );

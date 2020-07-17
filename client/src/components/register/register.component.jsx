@@ -12,7 +12,7 @@ import {
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { useDispatch } from 'react-redux';
-import { login } from '../../redux/auth/auth.actions';
+import { register } from '../../redux/auth/auth.actions';
 import AuthActionTypes from '../../redux/auth/auth.types';
 import Alert from '@material-ui/lab/Alert';
 import { clearErrors } from '../../redux/error/error.actions';
@@ -39,17 +39,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LoginForm = (props) => {
+const RegisterForm = (props) => {
   const classes = useStyles();
+  const [first_name, setFirstName] = useState('');
+  const [last_name, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState(null);
   const dispatch = useDispatch();
-  const auth = useSelector((state) => state.auth);
   const error = useSelector((state) => state.error);
 
   useEffect(() => {
-    if (error.id === AuthActionTypes.LOGIN_FAIL) {
+    if (error.id === AuthActionTypes.REGISTER_FAIL) {
       setMessage(error.msg.msg);
     } else {
       setMessage(null);
@@ -58,15 +59,13 @@ const LoginForm = (props) => {
 
   function handleSubmit(event) {
     event.preventDefault();
+
     dispatch(clearErrors());
-    const user = { email, password };
 
-    // Attempt to login
-    dispatch(login(user));
+    const newUser = { first_name, last_name, email, password };
 
-    console.log('auth.isAuth', auth.isAuthenticated);
-    if (auth.isAuthenticated) {
-    }
+    // Attempt to register
+    dispatch(register(newUser));
   }
 
   return (
@@ -75,10 +74,32 @@ const LoginForm = (props) => {
         <LockOutlinedIcon />
       </Avatar>
       <Typography component='h1' variant='h4'>
-        Sign in
+        Register
       </Typography>
 
       <form className={classes.form} onSubmit={handleSubmit}>
+        <TextField
+          id='first_name'
+          label='First Name'
+          variant='outlined'
+          margin='normal'
+          required
+          name='first_name'
+          autoComplete='first_name'
+          autoFocus
+          onChange={(e) => setFirstName(e.target.value)}
+        />
+        <TextField
+          id='last_name'
+          label='Last Name'
+          variant='outlined'
+          margin='normal'
+          required
+          name='last_name'
+          autoComplete='lastName'
+          autoFocus
+          onChange={(e) => setLastName(e.target.value)}
+        />
         <TextField
           id='email'
           label='Email'
@@ -106,7 +127,7 @@ const LoginForm = (props) => {
           variant='contained'
           color='primary'
         >
-          Log in
+          Register
         </Button>
       </form>
 
@@ -115,4 +136,4 @@ const LoginForm = (props) => {
   );
 };
 
-export default LoginForm;
+export default RegisterForm;

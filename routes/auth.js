@@ -13,10 +13,10 @@ router.get('/protected', auth, (req, res) => {
 // TODO replace local array with redis cache for refresh tokens
 const refreshTokens = [];
 
-// User refresh token to get new token
+// Use refresh token to get new token
 router.post('/token', (req, res) => {
-  const refreshToken = req.body.token;
-  if (refreshToken == null) return res.sendStatus(401);
+  const refreshToken = req.body.refreshToken;
+  if (refreshToken === null) return res.sendStatus(401);
   if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);
@@ -26,11 +26,11 @@ router.post('/token', (req, res) => {
 });
 
 // @route POST api/auth/logout
-// @desc logout and remove refresh token
+// @desc Logout and remove refresh token
 // @access Public
 router.delete('/logout', (req, res) => {
   refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
-  res.sendStatus(204);
+  return res.status(204).json({});
 });
 
 // @route POST api/auth/login
@@ -38,13 +38,11 @@ router.delete('/logout', (req, res) => {
 // @access Public
 router.post('/login', async (req, res) => {
   if (!req.body.email || !req.body.password) {
-    return res.status(400).send({ message: 'Some values are missing' });
+    return res.status(400).send({ msg: 'Some values are missing' });
   }
 
   if (!Utils.isValidEmail(req.body.email)) {
-    return res
-      .status(400)
-      .json({ message: 'Please enter a valid email address' });
+    return res.status(400).json({ msg: 'Please enter a valid email address' });
   }
 
   try {
@@ -64,22 +62,105 @@ router.post('/login', async (req, res) => {
       // TODO replace local array with redis cache for refresh tokens
       refreshTokens.push(refreshToken);
 
+      const { email, first_name, last_name, user_base_id } = user;
       return res.status(200).json({
         user: {
-          email: user.email,
-          first_name: user.first_name,
-          last_names: user.last_name,
-          user_base_id: user.user_base_id,
+          email,
+          first_name,
+          last_name,
+          user_base_id,
         },
         accessToken: accessToken,
         refreshToken: refreshToken,
       });
     } else {
-      return res.status(500).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ msg: 'Invalid credentials' });
     }
-  } catch (error) {
-    console.error(error);
-    return res.status(401).json(error);
+  } catch (err) {
+    console.error(err);
+    return res.status(401).json({ msg: err.message });
+  }
+});
+
+// @route POST api/auth/register
+// @desc register new user
+// @access Public
+router.post('/register', async (req, res) => {
+  console.log('req.body', req.body);
+  if (
+    !req.body.email ||
+    !req.body.first_name ||
+    !req.body.last_name ||
+    !req.body.password
+  ) {
+    return res.status(400).json({ msg: 'Some values are missing' });
+  }
+
+  if (!Utils.isValidEmail(req.body.email)) {
+    return res.status(400).json({ msg: 'Please enter a valid email address' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    const sqlQuery = `INSERT INTO
+      user_base(email, password_hash, first_name, last_name)
+      VALUES($1, $2, $3, $4)
+      returning *`;
+
+    const values = [
+      req.body.email,
+      hashedPassword,
+      req.body.first_name,
+      req.body.last_name,
+    ];
+
+    // Create user in DB
+    const { rows } = await pool.query(sqlQuery, values);
+    const user = rows[0];
+
+    const accessToken = Utils.generateAccessToken(user);
+    const refreshToken = Utils.generateRefreshToken(user);
+
+    // TODO replace local array with redis cache for refresh tokens
+    refreshTokens.push(refreshToken);
+
+    console.log(refreshToken);
+
+    const { email, first_name, last_name, user_base_id } = user;
+    return res.status(200).json({
+      user: {
+        email,
+        first_name,
+        last_name,
+        user_base_id,
+      },
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
+  } catch (err) {
+    console.log('Error creating user');
+    if (err.routine === '_bt_check_unique') {
+      return res
+        .status(400)
+        .json({ msg: 'User with that email already exists' });
+    }
+    return res.status(400).json(err.message);
+  }
+});
+
+// Get user using accessToken. req.user comes from the token payload and is decoded in middleware
+router.get('/user', auth, async (req, res) => {
+  try {
+    console.log('getting /user req.user', req.user);
+    const user = await pool.query(
+      'SELECT * FROM user_base WHERE user_base_id = $1',
+      [req.user.id]
+    );
+    if (!user) throw Error('User does not exist');
+    return res.json(user);
+  } catch (err) {
+    return res.status(400).json({ msg: err.message });
   }
 });
 

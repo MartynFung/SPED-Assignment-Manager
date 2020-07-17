@@ -1,12 +1,13 @@
 import TeacherActionTypes from './teacher.types';
+import axios from 'axios';
 
 export const getTeachers = () => (dispatch) => {
-  return fetch('/api/teachers')
-    .then((res) => res.json())
-    .then((teachers) =>
+  axios
+    .get('/api/teachers')
+    .then((res) =>
       dispatch({
         type: TeacherActionTypes.GET_TEACHERS,
-        payload: teachers,
+        payload: res.data,
       })
     )
     .catch((error) => console.log(error));

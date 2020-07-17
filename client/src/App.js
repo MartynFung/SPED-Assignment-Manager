@@ -2,51 +2,35 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/navbar/navbar.component';
 import Routes from './components/routes/routes.component';
 import { Container } from '@material-ui/core';
+import { Provider } from 'react-redux';
+import store from './redux/store';
+import { BrowserRouter as Router } from 'react-router-dom';
+
 import './App.css';
-const axios = require('axios');
-axios.defaults.withCredentials = true;
+import { loadUser } from './redux/auth/auth.actions';
 
 function App() {
+  // TODO: remove this code
   const [userCreds, userHasAuthenticated] = useState({
     loggedIn: false,
     username: null,
   });
 
   useEffect(() => {
-    if (userCreds.loggedIn === false) {
-      //getUser();
-      userHasAuthenticated({ loggedIn: false, username: null });
-    }
-  }, [userCreds.loggedIn]);
-
-  async function getUser() {
-    try {
-      axios.get('/auth').then((response) => {
-        console.log('Get user response: ');
-        console.log(response);
-        if (response.data.user) {
-          console.log('Get User: There is a use saved in the server session: ');
-          userHasAuthenticated({
-            loggedIn: true,
-            username: response.data.user.username,
-          });
-        } else {
-          console.log('Get user: no user');
-          userHasAuthenticated({ loggedIn: false, username: null });
-        }
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }
+    store.dispatch(loadUser());
+  });
 
   return (
-    <div className='App'>
-      <Navbar />
-      <Container className='content-grid' maxWidth='lg'>
-        <Routes childProps={{ userCreds, userHasAuthenticated }} />
-      </Container>
-    </div>
+    <Provider store={store}>
+      <Router>
+        <div className='App'>
+          <Navbar />
+          <Container className='content-grid' maxWidth='lg'>
+            <Routes childProps={{ userCreds, userHasAuthenticated }} />
+          </Container>
+        </div>
+      </Router>
+    </Provider>
   );
 }
 

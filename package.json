@@ -14,12 +14,14 @@
   "author": "Martyn Fung",
   "license": "MIT",
   "dependencies": {
+    "@material-ui/lab": "^4.0.0-alpha.56",
     "bcrypt": "^5.0.0",
     "concurrently": "^5.2.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "material-table": "^1.65.0",
     "pg": "^8.2.1"
   },
   "devDependencies": {
