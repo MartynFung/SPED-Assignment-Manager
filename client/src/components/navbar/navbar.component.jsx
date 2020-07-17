@@ -45,7 +45,6 @@ const AuthLinks = () => {
       >
         Students
       </Button>
-
       <Button
         variant='contained'
         color='secondary'

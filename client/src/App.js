@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Navbar from './components/navbar/navbar.component';
 import Routes from './components/routes/routes.component';
 import { Container } from '@material-ui/core';
@@ -10,12 +10,6 @@ import './App.css';
 import { loadUser } from './redux/auth/auth.actions';
 
 function App() {
-  // TODO: remove this code
-  const [userCreds, userHasAuthenticated] = useState({
-    loggedIn: false,
-    username: null,
-  });
-
   useEffect(() => {
     store.dispatch(loadUser());
   });
@@ -26,7 +20,7 @@ function App() {
         <div className='App'>
           <Navbar />
           <Container className='content-grid' maxWidth='lg'>
-            <Routes childProps={{ userCreds, userHasAuthenticated }} />
+            <Routes />
           </Container>
         </div>
       </Router>

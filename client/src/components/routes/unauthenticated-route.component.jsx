@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const queryString = (name, url = window.location.href) => {
   name = name.replace(/[[]]/g, '\\$&');
@@ -17,17 +18,18 @@ const queryString = (name, url = window.location.href) => {
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
 
-const UnauthenticatedRoute = ({ component: C, props: cProps, ...rest }) => {
+const UnauthenticatedRoute = ({ component: C, ...rest }) => {
   const redirect = queryString('redirect');
+  const auth = useSelector((state) => state.auth);
   return (
     <Route
       {...rest}
       render={(props) =>
-        !cProps.userCreds.loggedIn ? (
-          <C {...props} {...cProps} />
+        !auth.isAuthenticated ? (
+          <C {...props} />
         ) : (
           <Redirect
-            to={redirect === '' || redirect === null ? '/' : redirect}
+            to={redirect === '' || redirect === null ? '/teachers' : redirect}
           />
         )
       }

@@ -6,7 +6,6 @@ import errorReducer from './error/error.reducer';
 import authReducer from './auth/auth.reducer';
 
 export default combineReducers({
-  //user: userReducer,
   student: studentReducer,
   teacher: teacherReducer,
   error: errorReducer,

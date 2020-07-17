@@ -11,36 +11,11 @@ import RegisterForm from '../register/register.component';
 const Routes = ({ childProps }) => {
   return (
     <Switch>
-      <UnauthenticatedRoute
-        path='/register'
-        exact
-        component={RegisterForm}
-        props={childProps}
-      />
-      <UnauthenticatedRoute
-        path='/login'
-        exact
-        component={LoginForm}
-        props={childProps}
-      />
-      {/*<UnauthenticatedRoute
-        path='/teachers'
-        exact
-        component={TeacherPage}
-        props={childProps}
-      />*/}
-      <UnauthenticatedRoute
-        path='/students'
-        exact
-        component={StudentPage}
-        props={childProps}
-      />
-      <AuthenticatedRoute
-        path='/teachers'
-        exact
-        component={TeacherPage}
-        props={childProps}
-      />
+      <UnauthenticatedRoute path='/' exact component={LoginForm} />
+      <UnauthenticatedRoute path='/login' exact component={LoginForm} />
+      <UnauthenticatedRoute path='/register' exact component={RegisterForm} />
+      <AuthenticatedRoute path='/students' exact component={StudentPage} />
+      <AuthenticatedRoute path='/teachers' exact component={TeacherPage} />
       <Route component={NotFound} />
     </Switch>
   );
