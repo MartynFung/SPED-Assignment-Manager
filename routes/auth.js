@@ -5,6 +5,16 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
 
+const getUserQuery = `
+  SELECT ub.email,
+    ub.user_base_id,
+    ub.password_hash,
+    p.first_name,
+    p.last_name
+  FROM user_base AS ub
+  LEFT JOIN person AS p ON ub.person_id = p.person_id
+  WHERE ub.email = $1 LIMIT 1`;
+
 router.get('/protected', auth, (req, res) => {
   console.log('hitting protected route');
   res.json(req.user);
@@ -28,7 +38,7 @@ router.post('/token', (req, res) => {
 // @route POST api/auth/logout
 // @desc Logout and remove refresh token
 // @access Public
-router.delete('/logout', (req, res) => {
+router.delete('/logout', async (req, res) => {
   refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
   return res.status(204).json({});
 });
@@ -46,8 +56,7 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    const sqlQuery = 'SELECT * FROM user_base WHERE email = $1 LIMIT 1';
-    const { rows } = await pool.query(sqlQuery, [req.body.email]);
+    const { rows } = await pool.query(getUserQuery, [req.body.email]);
     const user = rows[0];
 
     if (!user) return res.status(400).send('User does not exist');
@@ -101,13 +110,23 @@ router.post('/register', async (req, res) => {
   }
 
   try {
+    // Check if user already exists
+    const data = await pool.query(
+      `SELECT * FROM user_base AS ub WHERE ub.email = $1`,
+      [req.body.email]
+    );
+    const existingUser = data.rows[0];
+    console.log({ existingUser });
+
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ msg: 'User with that email already exists' });
+    }
+
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-    const sqlQuery = `INSERT INTO
-      user_base(email, password_hash, first_name, last_name)
-      VALUES($1, $2, $3, $4)
-      returning *`;
-
+    const registerQuery = `CALL public.register_user($1, $2, $3, $4)`;
     const values = [
       req.body.email,
       hashedPassword,
@@ -116,18 +135,18 @@ router.post('/register', async (req, res) => {
     ];
 
     // Create user in DB
-    const { rows } = await pool.query(sqlQuery, values);
-    const user = rows[0];
+    await pool.query(registerQuery, values);
 
-    const accessToken = Utils.generateAccessToken(user);
-    const refreshToken = Utils.generateRefreshToken(user);
+    const { rows } = await pool.query(getUserQuery, [req.body.email]);
+    const newUser = rows[0];
+
+    const accessToken = Utils.generateAccessToken(newUser);
+    const refreshToken = Utils.generateRefreshToken(newUser);
 
     // TODO replace local array with redis cache for refresh tokens
     refreshTokens.push(refreshToken);
 
-    console.log(refreshToken);
-
-    const { email, first_name, last_name, user_base_id } = user;
+    const { email, first_name, last_name, user_base_id } = newUser;
     return res.status(200).json({
       user: {
         email,
@@ -140,11 +159,6 @@ router.post('/register', async (req, res) => {
     });
   } catch (err) {
     console.log('Error creating user');
-    if (err.routine === '_bt_check_unique') {
-      return res
-        .status(400)
-        .json({ msg: 'User with that email already exists' });
-    }
     return res.status(400).json(err.message);
   }
 });

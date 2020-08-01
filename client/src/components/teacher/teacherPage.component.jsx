@@ -1,6 +1,11 @@
 import React, { useEffect, forwardRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getTeachers } from '../../redux/teacher/teacher.actions';
+import {
+  getTeachers,
+  createTeacher,
+  updateTeacher,
+  deleteTeacher,
+} from '../../redux/teacher/teacher.actions';
 
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -19,8 +24,6 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 
 import MaterialTable from 'material-table';
-
-const axios = require('axios');
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -54,42 +57,6 @@ const TeacherPage = () => {
     dispatch(getTeachers());
   }, [dispatch]);
 
-  const createItem = async (teacher) => {
-    try {
-      axios.post('/api/teachers', teacher).then((response) => {
-        alert('teacher created' + response);
-        dispatch(getTeachers());
-      });
-    } catch (err) {
-      alert('failed to create teacher' + err.message);
-      console.error(err.message);
-    }
-  };
-
-  const updateItem = async (teacher) => {
-    try {
-      axios.put('/api/teachers', teacher).then((response) => {
-        alert('teacher updated' + JSON.stringify(response));
-        dispatch(getTeachers());
-      });
-    } catch (err) {
-      alert('failed to update teacher' + err.message);
-      console.error(err.message);
-    }
-  };
-
-  const deleteItem = async (teacher) => {
-    try {
-      axios.delete(`/api/teachers/${teacher.teacher_id}`).then((response) => {
-        alert(response.data);
-        dispatch(getTeachers());
-      });
-    } catch (err) {
-      alert('failed to delete teacher' + err.message);
-      console.error(err.message);
-    }
-  };
-
   return (
     <div className='teachers-page'>
       <h1>Teachers</h1>
@@ -103,9 +70,9 @@ const TeacherPage = () => {
         data={teachers}
         title='Teachers Table'
         editable={{
-          onRowAdd: (newData) => createItem(newData),
-          onRowUpdate: (newData, oldData) => updateItem(newData),
-          onRowDelete: (oldData) => deleteItem(oldData),
+          onRowAdd: (newData) => dispatch(createTeacher(newData)),
+          onRowUpdate: (newData, oldData) => dispatch(updateTeacher(newData)),
+          onRowDelete: (oldData) => dispatch(deleteTeacher(oldData.teacher_id)),
         }}
       />
     </div>

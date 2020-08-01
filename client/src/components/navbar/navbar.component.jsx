@@ -55,7 +55,7 @@ const AuthLinks = () => {
         Logout
       </Button>
       <Typography>
-        {user ? `${user.first_name} ${user.last_name}` : null}
+        {user.first_name ? `${user.first_name} ${user.last_name}` : null}
       </Typography>
     </Fragment>
   );

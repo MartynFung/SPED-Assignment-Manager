@@ -1,15 +1,16 @@
 const router = require('express').Router();
 const pool = require('../config/database');
+const auth = require('../middleware/auth');
 // TODO protect these routes
 
 // Get all teachers
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const sql = 'SELECT teacher_id, first_name, last_name, email FROM teacher';
     const allTeachers = await pool.query(sql);
     res.json(allTeachers.rows);
   } catch (err) {
-    console.error(err.message);
+    return res.status(400).json({ msg: err.message });
   }
 });
 
@@ -28,7 +29,7 @@ router.get('/:id', async (req, res) => {
       res.status(404).end();
     }
   } catch (err) {
-    console.error(err.message);
+    return res.status(400).json({ msg: err.message });
   }
 });
 
@@ -46,9 +47,9 @@ router.post('/', async (req, res) => {
     RETURNING teacher_id, first_name, last_name, email`;
 
     const newTeacher = await pool.query(sql, [first_name, last_name, email]);
-    res.json(newTeacher.rows[0]);
+    return res.json(newTeacher.rows[0]);
   } catch (err) {
-    console.error(err.message);
+    return res.status(400).json({ msg: err.message });
   }
 });
 
@@ -74,7 +75,7 @@ router.put('/', async (req, res) => {
     ]);
     res.status(200).json('Teacher updated successfully');
   } catch (err) {
-    console.error(err.message);
+    return res.status(400).json({ msg: err.message });
   }
 });
 
@@ -90,7 +91,7 @@ router.delete('/:id', async (req, res) => {
       res.status(200).json(`Teacher successfully deleted`);
     }
   } catch (err) {
-    console.error(err.message);
+    return res.status(400).json({ msg: err.message });
   }
 });
 

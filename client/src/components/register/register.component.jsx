@@ -85,7 +85,7 @@ const RegisterForm = (props) => {
           margin='normal'
           required
           name='first_name'
-          autoComplete='first_name'
+          autoComplete='given-name'
           autoFocus
           onChange={(e) => setFirstName(e.target.value)}
         />
@@ -96,7 +96,7 @@ const RegisterForm = (props) => {
           margin='normal'
           required
           name='last_name'
-          autoComplete='lastName'
+          autoComplete='family-name'
           autoFocus
           onChange={(e) => setLastName(e.target.value)}
         />
