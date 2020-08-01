@@ -20,7 +20,7 @@ const authReducer = (state = INITIAL_STATE, action) => {
         ...state,
         isAuthenticated: true,
         isLoading: false,
-        user: action.payload,
+        user: action.payload.user,
       };
     case AuthActionTypes.LOGIN_SUCCESS:
     case AuthActionTypes.REGISTER_SUCCESS:
@@ -28,7 +28,9 @@ const authReducer = (state = INITIAL_STATE, action) => {
       localStorage.setItem('refreshToken', action.payload.refreshToken);
       return {
         ...state,
-        ...action.payload, // contains payload.user, payload.accessToken, payload.refreshToken
+        user: action.payload.user,
+        accessToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
         isAuthenticated: true,
         isLoading: false,
       };

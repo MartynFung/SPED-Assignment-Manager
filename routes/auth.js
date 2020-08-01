@@ -167,12 +167,30 @@ router.post('/register', async (req, res) => {
 router.get('/user', auth, async (req, res) => {
   try {
     console.log('getting /user req.user', req.user);
-    const user = await pool.query(
-      'SELECT * FROM user_base WHERE user_base_id = $1',
-      [req.user.id]
-    );
+    const sqlQuery = `
+    SELECT ub.email,
+      ub.user_base_id,
+      ub.password_hash,
+      p.first_name,
+      p.last_name
+    FROM user_base AS ub
+    LEFT JOIN person AS p ON ub.person_id = p.person_id
+    WHERE ub.user_base_id = $1 LIMIT 1`;
+
+    const { rows } = await pool.query(sqlQuery, [req.user.id]);
+    console.log({ rows });
+    const user = rows[0];
     if (!user) throw Error('User does not exist');
-    return res.json(user);
+    console.log({ user });
+    const { email, first_name, last_name, user_base_id } = user;
+    return res.status(200).json({
+      user: {
+        email,
+        first_name,
+        last_name,
+        user_base_id,
+      },
+    });
   } catch (err) {
     return res.status(400).json({ msg: err.message });
   }

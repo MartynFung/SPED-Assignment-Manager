@@ -15,7 +15,6 @@ const auth = (req, res, next) => {
         .json({ msg: 'Token verification failed, authorization denied.' });
 
     req.user = payload;
-    console.log('req.user', req.user);
     next();
   });
 };
