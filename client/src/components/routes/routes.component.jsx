@@ -8,7 +8,7 @@ import TeacherPage from '../teacher/teacherPage.component';
 import StudentPage from '../student/studentPage.component';
 import RegisterForm from '../register/register.component';
 
-const Routes = ({ childProps }) => {
+const Routes = () => {
   return (
     <Switch>
       <UnauthenticatedRoute path='/' exact component={LoginForm} />

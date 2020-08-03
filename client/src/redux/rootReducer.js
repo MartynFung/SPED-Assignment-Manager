@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux';
-// import userReducer from './user/user.reducer';
 import studentReducer from './student/student.reducer';
 import teacherReducer from './teacher/teacher.reducer';
 import errorReducer from './error/error.reducer';

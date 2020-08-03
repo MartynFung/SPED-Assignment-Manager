@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const pool = require('../config/database');
 const auth = require('../middleware/auth');
-// TODO protect these routes
 
 // Get all teachers
 router.get('/', auth, async (req, res) => {
@@ -15,7 +14,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Get a teacher by id
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   try {
     const teacher_id = req.params.id;
     const sql = `
@@ -34,7 +33,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a teacher
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
     const { first_name, last_name, email } = req.body;
     if (!first_name || !last_name || !email) {
@@ -54,7 +53,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update a teacher
-router.put('/', async (req, res) => {
+router.put('/', auth, async (req, res) => {
   try {
     const { teacher_id, first_name, last_name, email } = req.body;
     if (!teacher_id || !first_name || !last_name || !email) {
@@ -80,7 +79,7 @@ router.put('/', async (req, res) => {
 });
 
 // Delete a teacher
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     const teacher_id = req.params.id;
     const sql = `DELETE FROM teacher WHERE teacher_id = $1 RETURNING *`;

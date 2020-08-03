@@ -140,8 +140,9 @@ router.post('/register', async (req, res) => {
     const { rows } = await pool.query(getUserQuery, [req.body.email]);
     const newUser = rows[0];
 
-    const accessToken = Utils.generateAccessToken(newUser);
-    const refreshToken = Utils.generateRefreshToken(newUser);
+    const payload = Utils.generatePayload(newUser);
+    const accessToken = Utils.generateAccessToken(payload);
+    const refreshToken = Utils.generateRefreshToken(payload);
 
     // TODO replace local array with redis cache for refresh tokens
     refreshTokens.push(refreshToken);
@@ -178,7 +179,6 @@ router.get('/user', auth, async (req, res) => {
     WHERE ub.user_base_id = $1 LIMIT 1`;
 
     const { rows } = await pool.query(sqlQuery, [req.user.id]);
-    console.log({ rows });
     const user = rows[0];
     if (!user) throw Error('User does not exist');
     console.log({ user });
