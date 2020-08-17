@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const errorHandler = require('./lib/errorHandler');
 
 // Provides acccess to variables in .env file via 'process.env.VARIABLE_NAME'
 require('dotenv').config();
@@ -27,6 +28,9 @@ app.get('/api/students', (req, res) => {
 
   res.json(students);
 });
+
+// Global error handler
+app.use(errorHandler);
 
 // SERVER
 const PORT = process.env.PORT || 5000;

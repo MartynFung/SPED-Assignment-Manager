@@ -30,10 +30,10 @@ export const createTeacher = (teacher) => async (dispatch, getState) => {
   }
 };
 
-export const updateTeacher = (teacher) => async (dispatch) => {
+export const updateTeacher = (teacher) => async (dispatch, getState) => {
   try {
     const data = await axios
-      .put('/api/teachers', teacher)
+      .put('/api/teachers', teacher, tokenConfig(getState))
       .then((res) => res.data);
     alert('teacher updated: ' + JSON.stringify(data));
     dispatch(getTeachers());
@@ -43,10 +43,10 @@ export const updateTeacher = (teacher) => async (dispatch) => {
   }
 };
 
-export const deleteTeacher = (teacher_id) => async (dispatch) => {
+export const deleteTeacher = (teacher_id) => async (dispatch, getState) => {
   try {
     const data = await axios
-      .delete(`/api/teachers/${teacher_id}`)
+      .delete(`/api/teachers/${teacher_id}`, tokenConfig(getState))
       .then((res) => res.data);
     alert(data);
     dispatch(getTeachers());

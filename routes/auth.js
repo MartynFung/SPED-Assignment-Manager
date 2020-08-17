@@ -3,7 +3,9 @@ const Utils = require('../lib/utils');
 const pool = require('../config/database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const auth = require('../middleware/auth');
+const authToken = require('../middleware/authToken');
+const authRole = require('../middleware/authRole');
+const { ROLE } = require('../lib/roles');
 
 const getUserQuery = `
   SELECT ub.email,
@@ -15,7 +17,16 @@ const getUserQuery = `
   LEFT JOIN person AS p ON ub.person_id = p.person_id
   WHERE ub.email = $1 LIMIT 1`;
 
-router.get('/protected', auth, (req, res) => {
+const userRolesQuery = `
+  SELECT ar.role_name
+  FROM user_base AS ub
+  JOIN user_base_role AS ubr
+    ON ub.user_base_id = ubr.user_base_id
+  JOIN app_role AS ar
+    ON ubr.app_role_id = ar.app_role_id
+  WHERE ub.user_base_id = $1`;
+
+router.get('/protected', authToken, (req, res, next) => {
   console.log('hitting protected route');
   res.json(req.user);
 });
@@ -46,7 +57,7 @@ router.delete('/logout', async (req, res) => {
 // @route POST api/auth/login
 // @desc Auth user
 // @access Public
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send({ msg: 'Some values are missing' });
   }
@@ -63,6 +74,10 @@ router.post('/login', async (req, res) => {
 
     const isValid = await bcrypt.compare(req.body.password, user.password_hash);
 
+    let userRoles = await getUserRoles(user.user_base_id);
+
+    user.roles = userRoles;
+
     if (isValid) {
       const payload = Utils.generatePayload(user);
       const accessToken = Utils.generateAccessToken(payload);
@@ -71,13 +86,14 @@ router.post('/login', async (req, res) => {
       // TODO replace local array with redis cache for refresh tokens
       refreshTokens.push(refreshToken);
 
-      const { email, first_name, last_name, user_base_id } = user;
+      const { email, first_name, last_name, user_base_id, roles } = user;
       return res.status(200).json({
         user: {
           email,
           first_name,
           last_name,
           user_base_id,
+          roles,
         },
         accessToken: accessToken,
         refreshToken: refreshToken,
@@ -86,15 +102,14 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
   } catch (err) {
-    console.error(err);
-    return res.status(401).json({ msg: err.message });
+    return next(err);
   }
 });
 
 // @route POST api/auth/register
 // @desc register new user
 // @access Public
-router.post('/register', async (req, res) => {
+router.post('/register', async (req, res, next) => {
   console.log('req.body', req.body);
   if (
     !req.body.email ||
@@ -111,12 +126,11 @@ router.post('/register', async (req, res) => {
 
   try {
     // Check if user already exists
-    const data = await pool.query(
+    const userData = await pool.query(
       `SELECT * FROM user_base AS ub WHERE ub.email = $1`,
       [req.body.email]
     );
-    const existingUser = data.rows[0];
-    console.log({ existingUser });
+    const existingUser = userData.rows[0];
 
     if (existingUser) {
       return res
@@ -124,8 +138,11 @@ router.post('/register', async (req, res) => {
         .json({ msg: 'User with that email already exists' });
     }
 
+    // Salts and hashes password
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
+    // 8/17 currently when registering, user has no default roles
+    // TODO: add default role when creating new user
     const registerQuery = `CALL public.register_user($1, $2, $3, $4)`;
     const values = [
       req.body.email,
@@ -140,6 +157,9 @@ router.post('/register', async (req, res) => {
     const { rows } = await pool.query(getUserQuery, [req.body.email]);
     const newUser = rows[0];
 
+    let userRoles = await getUserRoles(newUser.user_base_id);
+    newUser.roles = userRoles;
+
     const payload = Utils.generatePayload(newUser);
     const accessToken = Utils.generateAccessToken(payload);
     const refreshToken = Utils.generateRefreshToken(payload);
@@ -147,27 +167,26 @@ router.post('/register', async (req, res) => {
     // TODO replace local array with redis cache for refresh tokens
     refreshTokens.push(refreshToken);
 
-    const { email, first_name, last_name, user_base_id } = newUser;
+    const { email, first_name, last_name, user_base_id, roles } = newUser;
     return res.status(200).json({
       user: {
         email,
         first_name,
         last_name,
         user_base_id,
+        roles,
       },
       accessToken: accessToken,
       refreshToken: refreshToken,
     });
   } catch (err) {
-    console.log('Error creating user');
-    return res.status(400).json(err.message);
+    return next(err);
   }
 });
 
 // Get user using accessToken. req.user comes from the token payload and is decoded in middleware
-router.get('/user', auth, async (req, res) => {
+router.get('/user', authToken, async (req, res, next) => {
   try {
-    console.log('getting /user req.user', req.user);
     const sqlQuery = `
     SELECT ub.email,
       ub.user_base_id,
@@ -181,19 +200,36 @@ router.get('/user', auth, async (req, res) => {
     const { rows } = await pool.query(sqlQuery, [req.user.id]);
     const user = rows[0];
     if (!user) throw Error('User does not exist');
-    console.log({ user });
-    const { email, first_name, last_name, user_base_id } = user;
+
+    let userRoles = await getUserRoles(req.user.id);
+    user.roles = userRoles;
+
+    const { email, first_name, last_name, user_base_id, roles } = user;
     return res.status(200).json({
       user: {
         email,
         first_name,
         last_name,
         user_base_id,
+        roles,
       },
     });
   } catch (err) {
-    return res.status(400).json({ msg: err.message });
+    return next(err);
   }
 });
 
 module.exports = router;
+
+const getUserRoles = async (user_base_id) => {
+  try {
+    const roleData = await pool.query(userRolesQuery, [user_base_id]);
+    let userRoles = [];
+    if (roleData.rows) {
+      userRoles = roleData.rows.map((row) => row.role_name);
+    }
+    return userRoles;
+  } catch {
+    return res.status(500).json({ msg: err.message });
+  }
+};

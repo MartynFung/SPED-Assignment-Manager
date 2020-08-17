@@ -56,7 +56,7 @@ const LoginForm = (props) => {
     }
   }, [error]);
 
-  function handleSubmit(event) {
+  const handleSubmit = (event) => {
     event.preventDefault();
     dispatch(clearErrors());
     const user = { email, password };
@@ -64,10 +64,10 @@ const LoginForm = (props) => {
     // Attempt to login
     dispatch(login(user));
 
-    console.log('auth.isAuth', auth.isAuthenticated);
-    if (auth.isAuthenticated) {
+    if (!auth.isAuthenticated) {
+      setMessage(error.message);
     }
-  }
+  };
 
   return (
     <Container className={classes.paper} maxWidth='xs'>

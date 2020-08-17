@@ -98,7 +98,7 @@ export const tokenConfig = (getState) => {
 
   // If token, add it to headers
   if (accessToken) {
-    config.headers['authorization'] = `Bearer ${accessToken}`;
+    config.headers['Authorization'] = `Bearer ${accessToken}`;
   }
 
   return config;
